@@ -42,6 +42,7 @@ our $PUBMSG_REGEX_POSTNICK = '.*?\s';
 
 use strict;
 use Irssi;
+use File::Basename;
 
 our $VERSION = '0.1';
 our %IRSSI = (
@@ -61,9 +62,11 @@ our $sms_reset = 0;
 sub call_notifier {
 	my ($reset, $force, $message) = @_;
 	my $args = '';
+	my ($filename, $directory) = fileparse($SMS_PATH);
 	$args = $args . ' --reset' if ($reset != 0);
 	$args = $args . ' --force' if ($force != 0);
 	$args = $args . ' --message ' . qq/"$message"/ if (length($message) > 0);
+	chdir $directory;
 
 	system($PYTHON_PATH . ' ' . $SMS_PATH . $args)
 }
