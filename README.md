@@ -1,4 +1,4 @@
-Irssi SMS
+Trigger SMS for Irssi
 =========
 This is an irssi script to interface with the [Twilio SMS](https://github.com/theckman/twilio-sms) script.  This script will cause an SMS to be sent on hilight or PM when you are marked away.  The Twilio SMS script will determine whether the SMS message should be sent or not to avoid excessive Twilio charges.
 
