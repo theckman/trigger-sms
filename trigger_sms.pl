@@ -65,7 +65,7 @@ sub call_notifier {
 	my ($filename, $directory) = fileparse($SMS_PATH);
 	$args = $args . ' --reset' if ($reset != 0);
 	$args = $args . ' --force' if ($force != 0);
-	$args = $args . ' --message ' . qq/"$message"/ if (length($message) > 0);
+	$args = $args . ' --message ' . qq/$message/ if (length($message) > 0);
 	chdir $directory;
 
 	system($PYTHON_PATH . ' ' . $SMS_PATH . $args)
