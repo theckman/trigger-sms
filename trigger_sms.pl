@@ -50,7 +50,7 @@ my $cfp = new Config::Irssi::Parser;
 
 open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($IRSSI_CONFIG), or something.  What'd you break?");
 
-my $cfhash = $cfp->parse($cfh);
+our $cfhash = $cfp->parse($cfh);
 
 our $VERSION = '0.1';
 our %IRSSI = (
@@ -115,6 +115,23 @@ sub pubmsg_handler {
 		my $body = '[' . $chatnet . '/' . $target . '/' . $nick . '] ' . $message;
 		call_notifier(0, 0, $body);
     }
+}
+
+sub message_public_handler {
+	my ($server, $message, $nick, $address, $target) = @_;
+	if($server->{usermode_away} && is_highlight($message)) {
+		my $body = '[' . $server->{chatnet} . '/' . $target . '/' . $nick . ']' . $message;
+		call_notifier(0, 0, $body);
+	}
+}
+
+sub is_hilight{
+	my $message = shift;
+	foreach my $hilite(@{$cfhash->{'hilights'}}) {
+		return 1 if ($message =~ m/$hilite->{'text'}/i);
+		continue;
+	}
+	return 0;
 }
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
