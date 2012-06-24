@@ -119,8 +119,16 @@ sub pubmsg_handler {
 
 sub message_public_handler {
 	my ($server, $message, $nick, $address, $target) = @_;
-	if($server->{usermode_away} && is_highlight($message)) {
+	if ($server->{usermode_away} && is_highlight($message)) {
 		my $body = '[' . $server->{chatnet} . '/' . $target . '/' . $nick . ']' . $message;
+		call_notifier(0, 0, $body);
+	}
+}
+
+sub message_irc_action_handler {
+	my ($server, $message, $nick, $addres, $target) = @_;
+	if ($server->{usermode_away} && is_highlight($message)) {
+		my $body = '[' . $server->{chatnet} . '/' . $target . ']' . '*' . $nick . ' ' . $message;
 		call_notifier(0, 0, $body);
 	}
 }
