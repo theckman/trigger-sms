@@ -29,6 +29,7 @@
 # Set the location of Python, and where the Twilio Notifier script live
 our $PYTHON_PATH = '/usr/bin/env python';
 our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
+our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 #
 # This regex exists to remove the nickname portion from channel hilights
 # you may ened to alter this depending on your theme.  However, this was
@@ -43,6 +44,13 @@ our $PUBMSG_REGEX_POSTNICK = '.*?\s';
 use strict;
 use Irssi;
 use File::Basename;
+use Config::Irssi::Parser;
+
+my $cfp = new Config::Irssi::Parser;
+
+open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($IRSSI_CONFIG), or something.  What'd you break?");
+
+my $cfhash = $cfp->parse($cfh);
 
 our $VERSION = '0.1';
 our %IRSSI = (
