@@ -16,6 +16,7 @@ Download the script itself to your irssi script folder.  This is usually `~/.irs
 	# Set the location of Python, and where the Twilio Notifier script live
 	our $PYTHON_PATH = '/usr/bin/env python';
 	our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
+	our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 
 Load
 ----
