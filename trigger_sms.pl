@@ -96,7 +96,7 @@ sub check_user_away {
 	$sms_reset = 0;
 }
 
-sub privmsg_handler {
+sub message_private_handler {
 	my ($server, $message, $nick, $address) = @_;
 	if ($server->{usermode_away}) {
 		my $body = '[' . $server->{chatnet} . '/' . $nick . '] ' . $message;
@@ -129,6 +129,6 @@ sub is_hilight{
 }
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
-Irssi::signal_add_last("message private", "privmsg_handler");
+Irssi::signal_add_last("message private", "message_private_handler");
 Irssi::signal_add_last("message public", "message_public_handler");
 Irssi::signal_add_last("message irc action", "message_irc_action_handler");
