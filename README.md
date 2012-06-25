@@ -4,7 +4,7 @@ This is an irssi script to interface with the [Twilio SMS](https://github.com/th
 
 Requirements
 ------------
-The trigger SMS script requires the [Config::Irssi::Parser](http://search.cpan.org/~dhardison/Config-Irssi-Parser-0.0.4/lib/Config/Irssi/Parser.pod) module be installed and available.  This module is used to parse the irssi configuration file to determine what irssi marks as a hilight.
+The trigger SMS script requires the [Config::Irssi::Parser](http://search.cpan.org/~dhardison/Config-Irssi-Parser-0.0.4/lib/Config/Irssi/Parser.pod) module be installed and available.  This module is used to parse the Irssi configuration file to determine what Irssi marks as a hilight.
 
 Installation
 ------------
