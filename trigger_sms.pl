@@ -144,4 +144,6 @@ sub is_hilight{
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
 Irssi::signal_add_last("message private", "privmsg_handler");
-Irssi::signal_add_last("print text", "pubmsg_handler")
+#Irssi::signal_add_last("print text", "pubmsg_handler")
+Irssi::signal_add_last("message public", "message_public_handler");
+Irssi::signal_add_last("message irc action", "message_irc_action_handler");
