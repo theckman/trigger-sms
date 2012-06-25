@@ -104,19 +104,6 @@ sub privmsg_handler {
 	}
 }
 
-sub pubmsg_handler {
-	my ($dest, $text, $stripped) = @_;
-	if ($user_away && ($dest->{level} & MSGLEVEL_HILIGHT) && ($dest->{level} & MSGLEVEL_PUBLIC)) {
-		my $chatnet = $dest->{server}->{chatnet};
-		my $target = $dest->{target};
-		my $nick = Irssi::parse_special('$;');
-		my $message = $stripped;
-		$message =~ s/($PUBMSG_REGEX_PRENICK)($nick)($PUBMSG_REGEX_POSTNICK)//;
-		my $body = '[' . $chatnet . '/' . $target . '/' . $nick . '] ' . $message;
-		call_notifier(0, 0, $body);
-    }
-}
-
 sub message_public_handler {
 	my ($server, $message, $nick, $address, $target) = @_;
 	if ($server->{usermode_away} && is_hilight($message)) {
@@ -143,6 +130,5 @@ sub is_hilight{
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
 Irssi::signal_add_last("message private", "privmsg_handler");
-#Irssi::signal_add_last("print text", "pubmsg_handler")
 Irssi::signal_add_last("message public", "message_public_handler");
 Irssi::signal_add_last("message irc action", "message_irc_action_handler");
