@@ -26,7 +26,8 @@
 ####
 # User editable options
 #
-# Set the location of Python, and where the Twilio Notifier script live
+# Set the location of Python, where the Twilio Notifier script lives,
+# and the location of your irssi configuration file
 our $PYTHON_PATH = '/usr/bin/env python';
 our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';

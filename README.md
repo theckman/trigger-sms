@@ -2,6 +2,10 @@ Trigger SMS for Irssi
 =========
 This is an irssi script to interface with the [Twilio SMS](https://github.com/theckman/twilio-sms) script.  This script will cause an SMS to be sent on hilight or PM when you are marked away.  The Twilio SMS script will determine whether the SMS message should be sent or not to avoid excessive Twilio charges.
 
+Requirements
+------------
+The trigger SMS script requires the [Config::Irssi::Parser](http://search.cpan.org/~dhardison/Config-Irssi-Parser-0.0.4/lib/Config/Irssi/Parser.pod) module be installed and available.  This module is used to parse the irssi configuration file to determine what irssi marks as a hilight.
+
 Installation
 ------------
 Download the script itself to your irssi script folder.  This is usually `~/.irssi/scripts`.  Once that's done, you'll want to open the file in your editor and set the path to the Twilio SMS script:
