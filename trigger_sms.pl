@@ -80,18 +80,18 @@ sub call_notifier {
 
 sub check_user_away {
 	foreach my $server (Irssi::servers()) {
-		if ($server->{usermode_away}) {
-			if (!$user_away && !$sms_reset) {
-				call_notifier(1, 0, '');
-				$user_away = 1;
-				$sms_reset = 1;
-			}
+		if ($server->{usermode_away} && !$sms_reset) {
+			call_notifier(1, 0, '');
+			$sms_reset = 1;
+			return 0;
+		}
+		elsif ($server->{usermode_away} && $sms_reset) {
+			return 0;
 		}
 		else {
-			$user_away = 0 if ($user_away);
+			$sms_reset = 0;
 		}
 	}
-	$sms_reset = 0;
 }
 
 sub message_private_handler {
