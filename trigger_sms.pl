@@ -27,16 +27,12 @@
 # User editable options
 #
 # Set the location of Python, where the Twilio Notifier script lives,
-# and the location of your irssi configuration file
+# the twilio-sms config file you want to use, and the location of your
+# irssi configuration file
 our $PYTHON_PATH = '/usr/bin/env python';
 our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
+#our $SMS_CONFIG = 'twilio-sms.json';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
-#
-# This regex exists to remove the nickname portion from channel hilights
-# you may ened to alter this depending on your theme.  However, this was
-# build to work on the default theme
-our $PUBMSG_REGEX_PRENICK = '^.*?';
-our $PUBMSG_REGEX_POSTNICK = '.*?\s';
 #
 # End user editable options
 # Do not edit beyond this point
@@ -75,6 +71,7 @@ sub call_notifier {
 	$message =~ s/\"/\\\"/g if (length($message) > 0);
 	$args = $args . ' --reset' if ($reset != 0);
 	$args = $args . ' --force' if ($force != 0);
+	$args = $args . ' --config "' . $SMS_CONFIG . '"' if (defined $SMS_CONFIG);
 	$args = $args . ' --message "' . $message . '"' if (length($message) > 0);
 	chdir $directory;
 
