@@ -53,7 +53,7 @@ open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($I
 
 our $cfhash = $cfp->parse($cfh);
 
-our $VERSION = '0.1';
+our $VERSION = '0.2';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'timothy.heckman@gmail.com',
