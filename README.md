@@ -18,7 +18,7 @@ Download the script itself to your irssi script folder.  This is usually `~/.irs
 	# irssi configuration file
 	our $PYTHON_PATH = '/usr/bin/env python';
 	our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
-	#our $SMS_CONFIG = 'twilio-sms.json';
+	our $SMS_CONFIG = 'twilio-sms.json';
 	our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 
 Load
