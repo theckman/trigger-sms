@@ -31,7 +31,7 @@
 # irssi configuration file
 our $PYTHON_PATH = '/usr/bin/env python';
 our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
-#our $TWSMS_CONFIG = 'twilio-sms.json';
+our $TWSMS_CONFIG = 'twilio-sms.json';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 #
 # End user editable options
@@ -70,7 +70,7 @@ sub call_notifier {
 	$message =~ s/\"/\\\"/g if (length($message) > 0);
 	$args .= ' --reset' if ($reset != 0);
 	$args .= ' --force' if ($force != 0);
-	$args .= ' --config "' . $TWSMS_CONFIG . '"' if (defined $TWSMS_CONFIG);
+	$args .= ' --config "' . $TWSMS_CONFIG . '"';
 	$args .= ' --message "' . $message . '"' if (length($message) > 0);
 	chdir $directory;
 
