@@ -120,7 +120,13 @@ sub message_irc_action_handler {
 sub is_hilight{
 	my $message = shift;
 	foreach my $hilite(@{$cfhash->{'hilights'}}) {
-		if ($message =~ m/\s$hilite->{'text'}\s/ && ($hilite->{'fullword'} eq "yes" || $hilite->{'fullword'} eq "true")) {
+		if ($message =~ m/^$hilite->{'text'}./) {
+			return 1;
+		}
+		elsif ($message =~ m/^.$hilite->{'text'}./) { # yes yes, I know.  IRC is not twitter...
+			return 1;
+		}
+		elsif ($message =~ m/\s$hilite->{'text'}\s/ && ($hilite->{'fullword'} eq "yes" || $hilite->{'fullword'} eq "true")) {
 			return 1;
 		}
 		elsif ($message =~ m/$hilite->{'text'}/ && ($hilite->{'fullword'} eq "no" || $hilite->{'fullword'} eq "false")) {
