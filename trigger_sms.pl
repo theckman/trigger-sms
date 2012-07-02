@@ -53,7 +53,7 @@ our $VERSION = '0.3';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'timothy.heckman@gmail.com',
-	url => 'FIXME',
+	url => 'https://github.com/theckman/trigger-sms',
 	name => 'trigger_sms',
 	description => 
 		"Interfaces with twilio-notifier Python script to send you " .
@@ -61,7 +61,6 @@ our %IRSSI = (
 		"Requires the twilio-notifier Python script on your system.",
 	license => 'MIT',
 );
-our $user_away = 0;
 our $sms_reset = 0;
 
 sub call_notifier {
