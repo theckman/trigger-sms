@@ -49,7 +49,7 @@ open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($I
 
 our $cfhash = $cfp->parse($cfh);
 
-our $VERSION = '0.1';
+our $VERSION = '0.3';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'timothy.heckman@gmail.com',
@@ -69,10 +69,10 @@ sub call_notifier {
 	my $args = '';
 	my ($filename, $directory) = fileparse($SMS_PATH);
 	$message =~ s/\"/\\\"/g if (length($message) > 0);
-	$args = $args . ' --reset' if ($reset != 0);
-	$args = $args . ' --force' if ($force != 0);
-	$args = $args . ' --config "' . $TWSMS_CONFIG . '"' if (defined $TWSMS_CONFIG);
-	$args = $args . ' --message "' . $message . '"' if (length($message) > 0);
+	$args .= ' --reset' if ($reset != 0);
+	$args .= ' --force' if ($force != 0);
+	$args .= ' --config "' . $TWSMS_CONFIG . '"' if (defined $TWSMS_CONFIG);
+	$args .= ' --message "' . $message . '"' if (length($message) > 0);
 	chdir $directory;
 
 	system($PYTHON_PATH . ' ' . $SMS_PATH . $args)
