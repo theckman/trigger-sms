@@ -27,16 +27,12 @@
 # User editable options
 #
 # Set the location of Python, where the Twilio Notifier script lives,
-# and the location of your irssi configuration file
+# the twilio-sms config file you want to use, and the location of your
+# irssi configuration file
 our $PYTHON_PATH = '/usr/bin/env python';
 our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
+our $TWSMS_CONFIG = 'twilio-sms.json';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
-#
-# This regex exists to remove the nickname portion from channel hilights
-# you may ened to alter this depending on your theme.  However, this was
-# build to work on the default theme
-our $PUBMSG_REGEX_PRENICK = '^.*?';
-our $PUBMSG_REGEX_POSTNICK = '.*?\s';
 #
 # End user editable options
 # Do not edit beyond this point
@@ -53,11 +49,11 @@ open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($I
 
 our $cfhash = $cfp->parse($cfh);
 
-our $VERSION = '0.2';
+our $VERSION = '0.3';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'timothy.heckman@gmail.com',
-	url => 'FIXME',
+	url => 'https://github.com/theckman/trigger-sms',
 	name => 'trigger_sms',
 	description => 
 		"Interfaces with twilio-notifier Python script to send you " .
@@ -65,7 +61,6 @@ our %IRSSI = (
 		"Requires the twilio-notifier Python script on your system.",
 	license => 'MIT',
 );
-our $user_away = 0;
 our $sms_reset = 0;
 
 sub call_notifier {
@@ -73,9 +68,10 @@ sub call_notifier {
 	my $args = '';
 	my ($filename, $directory) = fileparse($SMS_PATH);
 	$message =~ s/\"/\\\"/g if (length($message) > 0);
-	$args = $args . ' --reset' if ($reset != 0);
-	$args = $args . ' --force' if ($force != 0);
-	$args = $args . ' --message "' . $message . '"' if (length($message) > 0);
+	$args .= ' --reset' if ($reset != 0);
+	$args .= ' --force' if ($force != 0);
+	$args .= ' --config "' . $TWSMS_CONFIG . '"';
+	$args .= ' --message "' . $message . '"' if (length($message) > 0);
 	chdir $directory;
 
 	system($PYTHON_PATH . ' ' . $SMS_PATH . $args)
@@ -83,18 +79,18 @@ sub call_notifier {
 
 sub check_user_away {
 	foreach my $server (Irssi::servers()) {
-		if ($server->{usermode_away}) {
-			if (!$user_away && !$sms_reset) {
-				call_notifier(1, 0, '');
-				$user_away = 1;
-				$sms_reset = 1;
-			}
+		if ($server->{usermode_away} && !$sms_reset) {
+			call_notifier(1, 0, '');
+			$sms_reset = 1;
+			return 0;
+		}
+		elsif ($server->{usermode_away} && $sms_reset) {
+			return 0;
 		}
 		else {
-			$user_away = 0 if ($user_away);
+			$sms_reset = 0;
 		}
 	}
-	$sms_reset = 0;
 }
 
 sub message_private_handler {
@@ -124,7 +120,13 @@ sub message_irc_action_handler {
 sub is_hilight{
 	my $message = shift;
 	foreach my $hilite(@{$cfhash->{'hilights'}}) {
-		if ($message =~ m/\s$hilite->{'text'}\s/ && ($hilite->{'fullword'} eq "yes" || $hilite->{'fullword'} eq "true")) {
+		if ($message =~ m/^$hilite->{'text'}./) {
+			return 1;
+		}
+		elsif ($message =~ m/^.$hilite->{'text'}./) { # yes yes, I know.  IRC is not twitter...
+			return 1;
+		}
+		elsif ($message =~ m/\s$hilite->{'text'}\s/ && ($hilite->{'fullword'} eq "yes" || $hilite->{'fullword'} eq "true")) {
 			return 1;
 		}
 		elsif ($message =~ m/$hilite->{'text'}/ && ($hilite->{'fullword'} eq "no" || $hilite->{'fullword'} eq "false")) {
