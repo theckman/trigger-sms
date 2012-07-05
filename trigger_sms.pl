@@ -67,14 +67,14 @@ sub call_notifier {
 	my ($reset, $force, $message) = @_;
 	my $args = '';
 	my ($filename, $directory) = fileparse($SMS_PATH);
-	$message =~ s/\"/\\\"/g if (length($message) > 0);
-	$args .= ' --reset' if ($reset != 0);
-	$args .= ' --force' if ($force != 0);
-	$args .= ' --config "' . $TWSMS_CONFIG . '"';
-	$args .= ' --message "' . $message . '"' if (length($message) > 0);
+	$message =~ s/\'/\\\'/g if (length($message) > 0);
+	$args .= " --reset" if ($reset != 0);
+	$args .= " --force" if ($force != 0);
+	$args .= " --config '" . $TWSMS_CONFIG . "'";
+	$args .= " --message '" . $message . "'" if (length($message) > 0);
 	chdir $directory;
 
-	system($PYTHON_PATH . ' ' . $SMS_PATH . $args)
+	system($PYTHON_PATH, $SMS_PATH, $args);
 }
 
 sub check_user_away {
