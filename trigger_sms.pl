@@ -65,6 +65,7 @@ our $sms_reset = 0;
 sub call_notifier {
 	my ($reset, $force, $message) = @_;
 	my @sysArray = @SYSCALL;
+	$message =~ s/`/'/; # backticks show up as '?'
 	push @sysArray, qw(--reset) if ($reset != 0);
 	push @sysArray, qw(--force) if ($force != 0);
 	push @sysArray, qw(--config);
