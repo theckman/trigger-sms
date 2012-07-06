@@ -31,9 +31,6 @@
 # irssi configuration file
 our @SYSCALL = qw(/usr/bin/env python);
 push @SYSCALL, $ENV{HOME} . '/twilio-sms/twsms.py';
-
-#our $PYTHON_PATH = '/usr/bin/env python';
-#our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
 our $TWSMS_CONFIG = 'twilio-sms.json';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 #
@@ -43,7 +40,6 @@ our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 
 use strict;
 use Irssi;
-use File::Basename;
 use Config::Irssi::Parser;
 
 my $cfp = new Config::Irssi::Parser;
@@ -68,8 +64,6 @@ our $sms_reset = 0;
 
 sub call_notifier {
 	my ($reset, $force, $message) = @_;
-	#my ($filename, $directory) = fileparse($SMS_PATH);
-	#$message =~ s/\'/\\\'/g if (length($message) > 0);
 	my @sysArray = @SYSCALL;
 	push @sysArray, qw(--reset) if ($reset != 0);
 	push @sysArray, qw(--force) if ($force != 0);
@@ -77,11 +71,9 @@ sub call_notifier {
 	push @sysArray, $TWSMS_CONFIG;
 	if (length($message) > 0) {
 		push @sysArray, qw(--message);
-		push @sysArray, split /\s+/, $message;
+		push @sysArray, "$message";
 	}
-	#chdir $directory;
 
-	#system($PYTHON_PATH, $SMS_PATH, $args);
 	system(@sysArray);
 }
 
