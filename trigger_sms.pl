@@ -70,7 +70,7 @@ sub call_notifier {
 	push @sysArray, qw(--config);
 	push @sysArray, $TWSMS_CONFIG;
 	if (length($message) > 0) {
-		$message =~ s/`/'/; # backticks show up as '?'
+		$message =~ s/`/'/g; # backticks show up as '?'
 		push @sysArray, qw(--message);
 		push @sysArray, "$message";
 	}
