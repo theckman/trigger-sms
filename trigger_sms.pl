@@ -29,8 +29,11 @@
 # Set the location of Python, where the Twilio Notifier script lives,
 # the twilio-sms config file you want to use, and the location of your
 # irssi configuration file
-our $PYTHON_PATH = '/usr/bin/env python';
-our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
+our @SYSCALL = qw(/usr/bin/env python);
+push @SYSCALL, $ENV{HOME} . '/twilio-sms/twsms.py';
+
+#our $PYTHON_PATH = '/usr/bin/env python';
+#our $SMS_PATH = $ENV{HOME} . '/twilio-sms/twsms.py';
 our $TWSMS_CONFIG = 'twilio-sms.json';
 our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 #
@@ -49,7 +52,7 @@ open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($I
 
 our $cfhash = $cfp->parse($cfh);
 
-our $VERSION = '0.3';
+our $VERSION = '0.4';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'timothy.heckman@gmail.com',
@@ -65,16 +68,21 @@ our $sms_reset = 0;
 
 sub call_notifier {
 	my ($reset, $force, $message) = @_;
-	my $args = '';
-	my ($filename, $directory) = fileparse($SMS_PATH);
-	$message =~ s/\'/\\\'/g if (length($message) > 0);
-	$args .= " --reset" if ($reset != 0);
-	$args .= " --force" if ($force != 0);
-	$args .= " --config '" . $TWSMS_CONFIG . "'";
-	$args .= " --message '" . $message . "'" if (length($message) > 0);
-	chdir $directory;
+	#my ($filename, $directory) = fileparse($SMS_PATH);
+	#$message =~ s/\'/\\\'/g if (length($message) > 0);
+	my @sysArray = @SYSCALL;
+	push @sysArray, qw(--reset) if ($reset != 0);
+	push @sysArray, qw(--force) if ($force != 0);
+	push @sysArray, qw(--config);
+	push @sysArray, $TWSMS_CONFIG;
+	if (length($message) > 0) {
+		push @sysArray, qw(--message);
+		push @sysArray, split /\s+/, $message;
+	}
+	#chdir $directory;
 
-	system($PYTHON_PATH, $SMS_PATH, $args);
+	#system($PYTHON_PATH, $SMS_PATH, $args);
+	system(@sysArray);
 }
 
 sub check_user_away {
