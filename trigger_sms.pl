@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Tim Heckman <timothy.heckman@gmail.com>
+# Copyright (c) 2012 Tim Heckman <tim@timheckman.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -51,7 +51,7 @@ our $cfhash = $cfp->parse($cfh);
 our $VERSION = '0.4';
 our %IRSSI = (
 	authors => 'Tim Heckman',
-	contact => 'timothy.heckman@gmail.com',
+	contact => 'tim@timheckman.net',
 	url => 'https://github.com/theckman/trigger-sms',
 	name => 'trigger_sms',
 	description => 
