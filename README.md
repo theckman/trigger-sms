@@ -4,7 +4,7 @@ This is an irssi script to interface with the [Twilio SMS](https://github.com/th
 
 Requirements
 ------------
-The trigger SMS script requires the [Config::Irssi::Parser](http://search.cpan.org/~dhardison/Config-Irssi-Parser-0.0.4/lib/Config/Irssi/Parser.pod) module be installed and available.  This module is used to parse the Irssi configuration file to determine what Irssi marks as a hilight.
+Beyond the Python script mentioned above to actually send the SMS, none. 
 
 Installation
 ------------
@@ -19,7 +19,6 @@ Download the script itself to your irssi script folder.  This is usually `~/.irs
 	our @SYSCALL = qw(/usr/bin/env python);
 	push @SYSCALL, $ENV{HOME} . '/twilio-sms/twsms.py';
 	our $TWSMS_CONFIG = 'twilio-sms.json';
-	our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 
 Load
 ----

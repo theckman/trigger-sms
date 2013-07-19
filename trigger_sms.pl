@@ -1,4 +1,4 @@
-# Copyright (c) 2012 Tim Heckman <tim@timheckman.net>
+# Copyright (c) 2012-2013 Tim Heckman <tim@timheckman.net>
 #
 # Permission is hereby granted, free of charge, to any person obtaining a
 # copy of this software and associated documentation files (the "Software"),
@@ -32,23 +32,16 @@
 our @SYSCALL = qw(/usr/bin/env python);
 push @SYSCALL, $ENV{HOME} . '/twilio-sms/twsms.py';
 our $TWSMS_CONFIG = 'twilio-sms.json';
-our $IRSSI_CONFIG = $ENV{HOME} . '/.irssi/config';
 #
 # End user editable options
 # Do not edit beyond this point
 ####
 
+use warnings;
 use strict;
 use Irssi;
-use Config::Irssi::Parser;
 
-my $cfp = new Config::Irssi::Parser;
-
-open(my $cfh, '<', $IRSSI_CONFIG) or die("Unable to locate irssi config file ($IRSSI_CONFIG), or something.  What'd you break?");
-
-our $cfhash = $cfp->parse($cfh);
-
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 our %IRSSI = (
 	authors => 'Tim Heckman',
 	contact => 'tim@timheckman.net',
@@ -60,7 +53,9 @@ our %IRSSI = (
 		"Requires the twilio-notifier Python script on your system.",
 	license => 'MIT',
 );
-our $sms_reset = 0;
+my $sms_reset = 0;
+my %message_data = ();
+my $levels = MSGLEVEL_HILIGHT|MSGLEVEL_MSGS;
 
 sub call_notifier {
 	my ($reset, $force, $message) = @_;
@@ -94,50 +89,67 @@ sub check_user_away {
 	}
 }
 
-sub message_private_handler {
+sub message_private {
 	my ($server, $message, $nick, $address) = @_;
 	if ($server->{usermode_away}) {
-		my $body = '[' . $server->{chatnet} . '/' . $nick . '] ' . $message;
-		call_notifier(0, 0, $body);
+		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+		$message_data{privmsg} = 1;
+		$message_data{nick} = $nick;
+		$message_data{message} = $message;
 	}
 }
 
-sub message_public_handler {
+sub message_public {
 	my ($server, $message, $nick, $address, $target) = @_;
-	if ($server->{usermode_away} && is_hilight($message)) {
-		my $body = '[' . $server->{chatnet} . '/' . $target . '/' . $nick . ']' . $message;
-		call_notifier(0, 0, $body);
+	if ($server->{usermode_away}) {
+		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+		$message_data{target} = $target;
+		$message_data{nick} = $nick;
+		$message_data{message} = $message;
 	}
 }
 
-sub message_irc_action_handler {
-	my ($server, $message, $nick, $addres, $target) = @_;
-	if ($server->{usermode_away} && is_hilight($message)) {
-		my $body = '[' . $server->{chatnet} . '/' . $target . ']' . '* ' . $nick . ' ' . $message;
-		call_notifier(0, 0, $body);
+sub message_irc_action {
+	my ($server, $message, $nick, $address, $target) = @_;
+	if ($server->{usermode_away}) {
+		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+		$message_data{privmsg} = 1 if ($server->{nick} eq $target);
+		$message_data{action} = 1;
+		$message_data{target} = $target;
+		$message_data{nick} = $nick;
+		$message_data{message} = $message;
 	}
 }
 
-sub is_hilight{
-	my $message = shift;
-	foreach my $hilite(@{$cfhash->{'hilights'}}) {
-		if ($message =~ m/^$hilite->{'text'}./) {
-			return 1;
-		}
-		elsif ($message =~ m/^.$hilite->{'text'}./) { # yes yes, I know.  IRC is not twitter...
-			return 1;
-		}
-		elsif ($message =~ m/\s$hilite->{'text'}\s/ && ($hilite->{'fullword'} eq "yes" || $hilite->{'fullword'} eq "true")) {
-			return 1;
-		}
-		elsif ($message =~ m/$hilite->{'text'}/ && ($hilite->{'fullword'} eq "no" || $hilite->{'fullword'} eq "false")) {
-			return 1;
+sub print_text {
+	my ($dest, $text, $stripped) = @_;
+	if ($server->{usermode_away}) {
+		if ($dest->{level} & $levels) {
+			my $body = '[';
+			$body .= "$message_data{chatnet}" if (exists $message_data{chatnet});
+			if (!exists $message_data{privmsg}) {
+				$body .= "/" if (length $body > 1);
+				$body .= "$message_data{target}";
+			}
+			else {
+				$body .= "/" if (length $body > 1);
+				$body .= "PM";
+			}
+			if (exists $message_data{action}) {
+				$body .= "]*$message_data{nick} $message_data{message}";
+			}
+			else {
+				$body .= "/" if (length $body > 1);
+				$body .= "$message_data{nick}]$message_data{message}";
+			}
+			%message_data = ();
+			call_notifier(0, 0, $body);
 		}
 	}
-	return 0;
 }
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
-Irssi::signal_add_last("message private", "message_private_handler");
-Irssi::signal_add_last("message public", "message_public_handler");
-Irssi::signal_add_last("message irc action", "message_irc_action_handler");
+Irssi::signal_add_last("message private", "message_private");
+Irssi::signal_add_last("message public", "message_public");
+Irssi::signal_add_last("message irc action", "message_irc_action");
+Irssi::signal_add_last("print text", "print_text");
