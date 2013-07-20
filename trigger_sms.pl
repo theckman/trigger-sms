@@ -122,7 +122,7 @@ sub message_irc_action {
 
 sub print_text {
     my ($dest, $text, $stripped) = @_;
-    if ($server->{usermode_away}) {
+    if (scalar keys %message_data > 0) {
         if ($dest->{level} & $levels) {
             my $body = '[';
             $body .= "$message_data{chatnet}" if (exists $message_data{chatnet});
