@@ -27,8 +27,7 @@
 # User editable options
 #
 # Set the location of Python, where the Twilio Notifier script lives,
-# the twilio-sms config file you want to use, and the location of your
-# irssi configuration file
+# the twilio-sms config file you want to use.
 our @SYSCALL = qw(/usr/bin/env python);
 push @SYSCALL, $ENV{HOME} . '/twilio-sms/twsms.py';
 our $TWSMS_CONFIG = 'twilio-sms.json';
