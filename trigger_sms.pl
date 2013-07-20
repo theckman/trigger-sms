@@ -43,109 +43,109 @@ use Irssi;
 
 our $VERSION = '0.5';
 our %IRSSI = (
-	authors => 'Tim Heckman',
-	contact => 'tim@timheckman.net',
-	url => 'https://github.com/theckman/trigger-sms',
-	name => 'trigger_sms',
-	description => 
-		"Interfaces with twilio-notifier Python script to send you " .
-		"SMS messages while marked as away." .
-		"Requires the twilio-notifier Python script on your system.",
-	license => 'MIT',
+    authors => 'Tim Heckman',
+    contact => 'tim@timheckman.net',
+    url => 'https://github.com/theckman/trigger-sms',
+    name => 'trigger_sms',
+    description =>
+        "Interfaces with twilio-notifier Python script to send you " .
+        "SMS messages while marked as away." .
+        "Requires the twilio-notifier Python script on your system.",
+    license => 'MIT',
 );
 my $sms_reset = 0;
 my %message_data = ();
 my $levels = MSGLEVEL_HILIGHT|MSGLEVEL_MSGS;
 
 sub call_notifier {
-	my ($reset, $force, $message) = @_;
-	my @sysArray = @SYSCALL;
-	push @sysArray, qw(--reset) if ($reset != 0);
-	push @sysArray, qw(--force) if ($force != 0);
-	push @sysArray, qw(--config);
-	push @sysArray, $TWSMS_CONFIG;
-	if (length($message) > 0) {
-		$message =~ s/`/'/g; # backticks show up as '?'
-		push @sysArray, qw(--message);
-		push @sysArray, "$message";
-	}
+    my ($reset, $force, $message) = @_;
+    my @sysArray = @SYSCALL;
+    push @sysArray, qw(--reset) if ($reset != 0);
+    push @sysArray, qw(--force) if ($force != 0);
+    push @sysArray, qw(--config);
+    push @sysArray, $TWSMS_CONFIG;
+    if (length($message) > 0) {
+        $message =~ s/`/'/g; # backticks show up as '?'
+        push @sysArray, qw(--message);
+        push @sysArray, "$message";
+    }
 
-	system(@sysArray);
+    system(@sysArray);
 }
 
 sub check_user_away {
-	foreach my $server (Irssi::servers()) {
-		if ($server->{usermode_away} && !$sms_reset) {
-			call_notifier(1, 0, '');
-			$sms_reset = 1;
-			return 0;
-		}
-		elsif ($server->{usermode_away} && $sms_reset) {
-			return 0;
-		}
-		else {
-			$sms_reset = 0;
-		}
-	}
+    foreach my $server (Irssi::servers()) {
+        if ($server->{usermode_away} && !$sms_reset) {
+            call_notifier(1, 0, '');
+            $sms_reset = 1;
+            return 0;
+        }
+        elsif ($server->{usermode_away} && $sms_reset) {
+            return 0;
+        }
+        else {
+            $sms_reset = 0;
+        }
+    }
 }
 
 sub message_private {
-	my ($server, $message, $nick, $address) = @_;
-	if ($server->{usermode_away}) {
-		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
-		$message_data{privmsg} = 1;
-		$message_data{nick} = $nick;
-		$message_data{message} = $message;
-	}
+    my ($server, $message, $nick, $address) = @_;
+    if ($server->{usermode_away}) {
+        $message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+        $message_data{privmsg} = 1;
+        $message_data{nick} = $nick;
+        $message_data{message} = $message;
+    }
 }
 
 sub message_public {
-	my ($server, $message, $nick, $address, $target) = @_;
-	if ($server->{usermode_away}) {
-		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
-		$message_data{target} = $target;
-		$message_data{nick} = $nick;
-		$message_data{message} = $message;
-	}
+    my ($server, $message, $nick, $address, $target) = @_;
+    if ($server->{usermode_away}) {
+        $message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+        $message_data{target} = $target;
+        $message_data{nick} = $nick;
+        $message_data{message} = $message;
+    }
 }
 
 sub message_irc_action {
-	my ($server, $message, $nick, $address, $target) = @_;
-	if ($server->{usermode_away}) {
-		$message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
-		$message_data{privmsg} = 1 if ($server->{nick} eq $target);
-		$message_data{action} = 1;
-		$message_data{target} = $target;
-		$message_data{nick} = $nick;
-		$message_data{message} = $message;
-	}
+    my ($server, $message, $nick, $address, $target) = @_;
+    if ($server->{usermode_away}) {
+        $message_data{chatnet} = $server->{chatnet} if (defined $server->{chatnet} && length $server->{chatnet});
+        $message_data{privmsg} = 1 if ($server->{nick} eq $target);
+        $message_data{action} = 1;
+        $message_data{target} = $target;
+        $message_data{nick} = $nick;
+        $message_data{message} = $message;
+    }
 }
 
 sub print_text {
-	my ($dest, $text, $stripped) = @_;
-	if ($server->{usermode_away}) {
-		if ($dest->{level} & $levels) {
-			my $body = '[';
-			$body .= "$message_data{chatnet}" if (exists $message_data{chatnet});
-			if (!exists $message_data{privmsg}) {
-				$body .= "/" if (length $body > 1);
-				$body .= "$message_data{target}";
-			}
-			else {
-				$body .= "/" if (length $body > 1);
-				$body .= "PM";
-			}
-			if (exists $message_data{action}) {
-				$body .= "]*$message_data{nick} $message_data{message}";
-			}
-			else {
-				$body .= "/" if (length $body > 1);
-				$body .= "$message_data{nick}]$message_data{message}";
-			}
-			%message_data = ();
-			call_notifier(0, 0, $body);
-		}
-	}
+    my ($dest, $text, $stripped) = @_;
+    if ($server->{usermode_away}) {
+        if ($dest->{level} & $levels) {
+            my $body = '[';
+            $body .= "$message_data{chatnet}" if (exists $message_data{chatnet});
+            if (!exists $message_data{privmsg}) {
+                $body .= "/" if (length $body > 1);
+                $body .= "$message_data{target}";
+            }
+            else {
+                $body .= "/" if (length $body > 1);
+                $body .= "PM";
+            }
+            if (exists $message_data{action}) {
+                $body .= "]*$message_data{nick} $message_data{message}";
+            }
+            else {
+                $body .= "/" if (length $body > 1);
+                $body .= "$message_data{nick}]$message_data{message}";
+            }
+            %message_data = ();
+            call_notifier(0, 0, $body);
+        }
+    }
 }
 
 Irssi::timeout_add(5*1000, 'check_user_away', '');
